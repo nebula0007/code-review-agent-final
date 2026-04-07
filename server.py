@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from app.env import CodeReviewEnv
 from app.models import Action
 
@@ -7,6 +7,13 @@ app = FastAPI()
 env = CodeReviewEnv()
 
 
+# ✅ Root (fixes empty HuggingFace page)
+@app.get("/")
+def root():
+    return {"message": "Code Review Env is running"}
+
+
+# 🔁 Reset
 @app.post("/reset")
 def reset():
     obs = env.reset()
@@ -19,11 +26,13 @@ def reset():
     }
 
 
-from fastapi import HTTPException
-
+# ▶️ Step
 @app.post("/step")
 def step(action: Action):
     try:
+        if env.current_task is None:
+            raise HTTPException(status_code=400, detail="Call /reset first")
+
         result = env.step(action)
 
         return {
@@ -37,6 +46,7 @@ def step(action: Action):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# 📊 State
 @app.get("/state")
 def state():
     return env.state()
