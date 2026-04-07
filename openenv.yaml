@@ -1,0 +1,35 @@
+name: code-review-env
+description: An environment where agents review code diffs and identify issues with fixes.
+
+endpoints:
+  reset: /reset
+  step: /step
+  state: /state
+
+method: http
+
+observation_space:
+  type: object
+  properties:
+    diff:
+      type: string
+    task_type:
+      type: string
+
+action_space:
+  type: object
+  properties:
+    issue_type:
+      type: string
+    description:
+      type: string
+    fix:
+      type: string
+
+reward_range: [0, 1]
+
+tags:
+  - code
+  - review
+  - llm
+  - evaluation
