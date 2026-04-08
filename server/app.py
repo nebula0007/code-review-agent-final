@@ -30,7 +30,9 @@ def step(action: Action):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+@app.get("/")
+def root():
+    return {"message": "REAL SERVER RUNNING"}
 
 @app.get("/state")
 def state():
