@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-server = "app.server:app"
+server = "app.main:main"
 
 [tool.setuptools.packages.find]
 include = ["app*"]
