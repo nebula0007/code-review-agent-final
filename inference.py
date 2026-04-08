@@ -3,13 +3,14 @@ import requests
 
 
 
-API_BASE_URL = os.environ["API_BASE_URL"]
 
-# API_BASE_URL = os.getenv("API_BASE_URL")
 
-# if not API_BASE_URL:
-#     API_BASE_URL = "http://127.0.0.1:7860"
-#     print("Using LOCAL API_BASE_URL:", API_BASE_URL)
+API_BASE_URL = os.getenv("API_BASE_URL")
+
+print("DEBUG API_BASE_URL =", API_BASE_URL)
+
+if not API_BASE_URL:
+    raise Exception("API_BASE_URL not provided by evaluator")
 MODEL_NAME = os.getenv("MODEL_NAME", "dummy")
 HF_TOKEN = os.getenv("HF_TOKEN")  # optional
 
