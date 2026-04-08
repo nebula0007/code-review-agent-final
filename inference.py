@@ -3,7 +3,7 @@ import requests
 
 
 
-API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:7860")
+API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:7860")
 MODEL_NAME = os.getenv("MODEL_NAME", "dummy")
 HF_TOKEN = os.getenv("HF_TOKEN")  # optional
 
