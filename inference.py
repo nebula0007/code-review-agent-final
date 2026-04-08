@@ -3,7 +3,7 @@ import requests
 
 
 
-API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:7860")
 MODEL_NAME = os.getenv("MODEL_NAME", "dummy")
 HF_TOKEN = os.getenv("HF_TOKEN")  # optional
 
@@ -32,6 +32,12 @@ def main():
     log_start()
 
     res = requests.post(f"{API_URL}/reset").json()
+
+    print("RESET RESPONSE:", res)
+
+    if not isinstance(res, dict) or "observation" not in res:
+        raise Exception(f"Invalid response from /reset: {res}")
+
     obs = res["observation"]
 
     for step in range(1, MAX_STEPS + 1):
@@ -177,6 +183,11 @@ def main():
         # API call
         res = requests.post(f"{API_URL}/step", json=action).json()
 
+        print("STEP RESPONSE:", res)  
+
+        if not isinstance(res, dict) or "observation" not in res:
+            raise Exception(f"Invalid response from /step: {res}")
+
         reward = res.get("reward", 0.0)
         done = res.get("done", False)
 
@@ -188,9 +199,11 @@ def main():
         if done:
             break
 
-        obs = res["observation"]
+        obs = res["observation"]   
 
-    success = max(rewards) > 0.5
+    if not rewards:
+        raise Exception("No rewards collected something is wrong")
+    success=max(rewards)>0.5
     log_end(success, len(rewards), rewards)
 
 
