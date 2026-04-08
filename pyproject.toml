@@ -10,9 +10,12 @@ dependencies = [
     "uvicorn",
     "pydantic",
     "requests",
-    "openai"
+    "openai",
+    "openenv-core>=0.2.0"
 ]
 
+[project.scripts]
+server = "app.server:app"
+
 [tool.setuptools.packages.find]
-where = ["."]
 include = ["app*"]
