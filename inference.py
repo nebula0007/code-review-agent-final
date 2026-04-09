@@ -22,11 +22,14 @@ def call_endpoint(path, data=None):
 
     for url in urls:
         try:
-            res = requests.post(url, json=data) if data else requests.post(url)
+            res = requests.post(url, json=data or {})
             if res.status_code == 200:
                 print("✅ Working URL:", url)
                 return res.json()
-        except Exception:
+            else:
+                print(f"❌ Tried {url} → {res.status_code}")
+        except Exception as e:
+            print(f"❌ Error calling {url}:", e)
             continue
 
     raise Exception(f"All endpoint attempts failed for {path}")
