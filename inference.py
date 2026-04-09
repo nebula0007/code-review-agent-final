@@ -13,6 +13,24 @@ API_BASE_URL = (
 
 print("DEBUG URL =", API_BASE_URL)
 
+def call_endpoint(path, data=None):
+    urls = [
+        f"{API_BASE_URL}{path}",
+        f"{API_BASE_URL}/env{path}",
+        f"{API_BASE_URL}/api{path}"
+    ]
+
+    for url in urls:
+        try:
+            res = requests.post(url, json=data) if data else requests.post(url)
+            if res.status_code == 200:
+                print("✅ Working URL:", url)
+                return res.json()
+        except Exception:
+            continue
+
+    raise Exception(f"All endpoint attempts failed for {path}")
+
 if not API_BASE_URL:
     raise Exception("No API base URL found")
 
@@ -44,7 +62,7 @@ def main():
 
     log_start()
 
-    res = requests.post(f"{API_URL}/reset").json()
+    res = call_endpoint("/reset")
 
     print("RESET RESPONSE:", res)
 
@@ -194,7 +212,7 @@ def main():
             }
 
         # API call
-        res = requests.post(f"{API_URL}/step", json=action).json()
+        res = call_endpoint("/step", action)
 
         print("STEP RESPONSE:", res)  
 
