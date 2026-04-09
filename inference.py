@@ -1,14 +1,18 @@
 import os
 import requests
 
-
+print("All ENV VARS:")
+for k,v in os.environ.items():
+    print(f"{k}={v}")
 
 
 
 API_BASE_URL = (
-    os.getenv("API_BASE_URL")
+    os.getenv("ENV_URL")
     or os.getenv("OPENENV_BASE_URL")
     or os.getenv("BASE_URL")
+    or os.getenv("API_BASE_URL")
+
 )
 
 print("DEBUG URL =", API_BASE_URL)
