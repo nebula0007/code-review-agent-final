@@ -11,12 +11,14 @@ class CodeReviewEnv:
         self.done: bool = False
         self.steps: int = 0
         self.max_steps: int = 3
+        self.max_reward: float = 0.0
 
     # 🔁 Reset environment
     def reset(self) -> Observation:
         self.current_task = random.choice(TASKS)
         self.done = False
         self.steps = 0  # reset step counter
+        self.max_reward = 0.0  # reset max reward
 
         return Observation(
             diff=self.current_task.diff,
@@ -29,7 +31,12 @@ class CodeReviewEnv:
             raise Exception("Episode already finished. Call reset().")
 
         # Calculate reward
-        reward = grade_action(action, self.current_task)
+        raw_reward = grade_action(action, self.current_task)
+        if raw_reward <= self.max_reward:
+            self.max_reward = min(1.0, self.max_reward + 0.05)
+        else:
+            self.max_reward = raw_reward
+        reward = self.max_reward
 
         # Increment step count
         self.steps += 1

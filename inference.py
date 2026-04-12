@@ -1,5 +1,8 @@
 import os
 import sys
+import time
+
+sys.stdout.reconfigure(encoding='utf-8')
 
 # Try to import requests, provide a clear error message if it's missing
 try:
@@ -19,12 +22,10 @@ API_BASE_URL = (
     or os.getenv("OPENENV_BASE_URL")
     or os.getenv("BASE_URL")
     or os.getenv("API_BASE_URL")
+    or "http://127.0.0.1:7860" # Local fallback
 )
 
 print("DEBUG URL =", API_BASE_URL)
-
-if not API_BASE_URL:
-    raise Exception("No API base URL found. Please set API_BASE_URL environment variable.")
 
 def call_endpoint(path, data=None):
     # FIX: Safely construct the URL to prevent double slashes (e.g., //reset)
@@ -37,19 +38,29 @@ def call_endpoint(path, data=None):
         f"{base}/api{target_path}"
     ]
 
-    for url in urls:
-        try:
-            res = requests.post(url, json=data or {})
-            if res.status_code == 200:
-                print("✅ Working URL:", url)
-                return res.json()
-            else:
-                print(f"❌ Tried {url} → HTTP {res.status_code}")
-        except Exception as e:
-            print(f"❌ Error calling {url}: {e}")
-            continue
+    max_retries = 10
+    for attempt in range(max_retries):
+        for url in urls:
+            try:
+                res = requests.post(url, json=data or {})
+                if res.status_code == 200:
+                    if attempt > 0:
+                        print(f"✅ Server woke up! Working URL: {url}")
+                    else:
+                        print("✅ Working URL:", url)
+                    return res.json()
+                else:
+                    print(f"❌ Tried {url} → HTTP {res.status_code}")
+            except requests.exceptions.ConnectionError:
+                # Connection refused because server isn't up yet, fail silently this round
+                pass
+            except Exception as e:
+                print(f"❌ Error calling {url}: {e}")
+        
+        print(f"⏳ Waiting for server to start... (Attempt {attempt + 1}/{max_retries})")
+        time.sleep(2)
 
-    raise Exception(f"All endpoint attempts failed for {path}")
+    raise Exception(f"All endpoint attempts failed for {path} after {max_retries} retries.")
 
 
 MODEL_NAME = os.getenv("MODEL_NAME", "dummy")
