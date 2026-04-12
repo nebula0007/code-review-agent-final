@@ -38,7 +38,7 @@ def call_endpoint(path, data=None):
         f"{base}/api{target_path}"
     ]
 
-    max_retries = 10
+    max_retries = 60
     for attempt in range(max_retries):
         for url in urls:
             try:
